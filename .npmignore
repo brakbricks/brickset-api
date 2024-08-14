@@ -1,3 +1,4 @@
+.github
 src
 node_modules
 coverage
@@ -6,3 +7,4 @@ spec
 tsconfig.json
 tsup.config.ts
 jest.config.ts
+jest.config.js
