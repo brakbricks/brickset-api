@@ -49,7 +49,7 @@ type GetCollectionParams = {
     owned?: 1;
     // Set to 1 to retrieve wanted
     wanted?: 1;
-    /** @var Search term: searches set number, name, theme and subtheme */
+    /**  Search term: searches set number, name, theme and subtheme */
     query?: string;
 }
 
@@ -62,28 +62,28 @@ type SetCollectionRequestData = UserHashRequestData & SetIDRequestData & { param
 type GetSetsRequestData = UserHashRequestData & { params: {
     //Internal SetID
     setID?: number;
-    // @var will accept a Decimal value or a comma delimited list.
+    //  will accept a Decimal value or a comma delimited list.
     theme?: number | string;
-    // @var will accept a Decimal value or a comma delimited list.
+    //  will accept a Decimal value or a comma delimited list.
     subtheme?: number | string;
-    /** @var Full set number, in the format {number}-{variant}, e.g. 6876-1 */
+    /**  Full set number, in the format {number}-{variant}, e.g. 6876-1 */
     setNumber?: string | string[];
-    // @var will accept a Decimal value or a comma delimited list.
+    //  will accept a Decimal value or a comma delimited list.
     year?: number | string;
     tag?: string;
-    /** @var yyyy-mm-dd format */
+    /**  yyyy-mm-dd format */
     updatedSince?: string;
     /**
-     * @var Sort order
+     *  Sort order
      * Valid values are Number, YearFrom, Pieces, Minifigs, Rating, [UK|US|CA|DERetailPrice], [UK|US|CA|DEPricePerPiece], Theme, Subtheme, Name, Random, QtyOwned, OwnCount, WantCount, UserRating, CollectionID (order record added to a user's collection), Rank (search ranking)
      * Add 'DESC' to the end of numerical field names to sort descending, e.g. PiecesDESC. Default: Number. Values are case-insensitive.
      */
     orderBy?: orderBy;
-    /** @var Specify how many records to retrieve (default: 20, max: 500) */
+    /**  Specify how many records to retrieve (default: 20, max: 500) */
     pageSize?: number;
-    //@var Specify which page of records to retrieve, use in conjunction with pageSize (default: 1)
+    // Specify which page of records to retrieve, use in conjunction with pageSize (default: 1)
     pageNumber?: number;
-    /** @var Set to 1 to retrieve the full data set, including tags, description and notes. */
+    /**  Set to 1 to retrieve the full data set, including tags, description and notes. */
     extendedData?: 1;
 } & GetCollectionParams };
 
@@ -139,3 +139,56 @@ export type GetUserNotesResponse = BricklinkApiSuccessResponse<
 export type GetUserMinifigNotesResponse = BricklinkApiSuccessResponse<
   MatchesSubResponse<{ userMinifigNotes: userMinifigNote[] }>
 >;
+
+
+export type getSetParams = {
+    setID?: number;
+    /**  Search term: searches set number, name, theme and subtheme */
+    query?: string;
+    theme?: string | string[];
+    subtheme?: string | string[];
+    /**  Full set number, in the format {number}-{variant}, e.g. 6876-1 */
+    setNumber?: string | string[];
+    year?: number | number[];
+    tag?: string;
+    owned?: true;
+    wanted?: true;
+    /**  yyyy-mm-dd format */
+    updatedSince?: Date;
+    orderBy?: orderBy;
+    /**  default 20, max 500 */
+    pageSize?: number;
+    pageNumber?: number;
+    /**  Set to 1 to retrieve the full data set, including tags, description and notes. */
+    extendedData?: true;
+  };
+  
+  export type setCollectionParams = {
+    /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
+    own: boolean;
+    want: boolean;
+    /**  0-999. If > 0 then own is automatically set to 1 */
+    qtyOwned: number;
+    /**  User notes, max 1000 characters */
+    notes: string;
+    /**  User rating 1-5 */
+    rating?: number;
+  };
+  
+  export type getMinifigCollectionParams = {
+    owned?: true;
+    wanted?: true;
+    /** This can be a minifig number or name. Wildcards are added before and after. If omitted, all minifigs owned are returned. */
+    query?: string;
+  };
+  
+  export type setMinifigCollectionParams = {
+    /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
+    own: boolean;
+    want: boolean;
+    /**  0-999. If > 0 then own is automatically set to 1 */
+    qtyOwned: number;
+    /**  User notes, max 1000 characters */
+    notes?: string;
+  };
+  

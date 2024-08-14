@@ -3,6 +3,7 @@ src
 node_modules
 coverage
 spec
+docs
 
 tsconfig.json
 tsup.config.ts

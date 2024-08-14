@@ -21,8 +21,10 @@ import {
   GetAdditionalImagesResponse,
   GetApiKeyUsageStatsResponse,
   GetInstructionsResponse,
+  getMinifigCollectionParams,
   GetMinifigCollectionResponse,
   GetReviewsResponse,
+  getSetParams,
   GetSetsResponse,
   GetSubthemesResponse,
   GetThemesResponse,
@@ -30,58 +32,9 @@ import {
   GetUserNotesResponse,
   GetYearsResponse,
   LoginResponse,
+  setCollectionParams,
+  setMinifigCollectionParams,
 } from "./types";
-
-type getSetParams = {
-  setID?: number;
-  /** @var Search term: searches set number, name, theme and subtheme */
-  query?: string;
-  theme?: string | string[];
-  subtheme?: string | string[];
-  /** @var Full set number, in the format {number}-{variant}, e.g. 6876-1 */
-  setNumber?: string | string[];
-  year?: number | number[];
-  tag?: string;
-  owned?: true;
-  wanted?: true;
-  /** @var yyyy-mm-dd format */
-  updatedSince?: Date;
-  orderBy?: orderBy;
-  /** @var default 20, max 500 */
-  pageSize?: number;
-  pageNumber?: number;
-  /** @var Set to 1 to retrieve the full data set, including tags, description and notes. */
-  extendedData?: true;
-};
-
-type setCollectionParams = {
-  /** @var 1 or 0. If 0 then qtyOwned is automatically set to 0 */
-  own: boolean;
-  want: boolean;
-  /** @var 0-999. If > 0 then own is automatically set to 1 */
-  qtyOwned: number;
-  /** @var User notes, max 1000 characters */
-  notes: string;
-  /** @var User rating 1-5 */
-  rating?: number;
-};
-
-type getMinifigCollectionParams = {
-  owned?: true;
-  wanted?: true;
-  /** This can be a minifig number or name. Wildcards are added before and after. If omitted, all minifigs owned are returned. */
-  query?: string;
-};
-
-type setMinifigCollectionParams = {
-  /** @var 1 or 0. If 0 then qtyOwned is automatically set to 0 */
-  own: boolean;
-  want: boolean;
-  /** @var 0-999. If > 0 then own is automatically set to 1 */
-  qtyOwned: number;
-  /** @var User notes, max 1000 characters */
-  notes?: string;
-};
 
 export class BricksetApiClient {
   constructor(private readonly apiKey: string) {}
@@ -126,6 +79,16 @@ export class BricksetApiClient {
   /**
    * Retrieve a list of sets, or more information about a particular one.
    * TODO: This endpoint is limited to 100 calls a day, use queue?
+   * 
+   * 
+   */
+
+
+  /**
+   * 
+   * @param params getSetParams
+   * @param userHash 
+   * @returns 
    */
   async getSets(params: getSetParams, userHash: string = ""): Promise<set[]> {
     const result = await this.request<GetSetsResponse>(ROUTES.GET_SETS, {
