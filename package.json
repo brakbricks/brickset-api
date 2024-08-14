@@ -1,0 +1,30 @@
+{
+  "name": "@brakbricks/brickset-api",
+  "version": "0.0.3",
+  "description": "A typescript Brickset API client",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "test": "jest"
+  },
+  "keywords": [
+    "Lego",
+    "API",
+    "Brickset"
+  ],
+  "repository": {
+    "url": "git+https://github.com/brakbricks/brickset-api.git"
+  },
+  "author": "Brakbricks",
+  "license": "MIT",
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.4",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
+  }
+}
