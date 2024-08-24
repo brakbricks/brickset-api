@@ -1,11 +1,11 @@
 import {
   apiKeyUsage,
-  image,
+  BricksetImage,
   instruction,
   minifigCollection,
   orderBy,
   review,
-  set,
+  BricksetSet,
   subtheme,
   theme,
   userMinifigNote,
@@ -13,53 +13,62 @@ import {
   year,
 } from "./data.types";
 
-type LoginRequestData = {
+interface LoginRequestData {
   username: string;
   password: string;
-};
+}
 
-type SetIDRequestData = {
+interface SetIDRequestData {
   setID: number;
-};
+}
 
-type SetNumberRequestData = {
+interface SetNumberRequestData {
   setNumber: string;
-};
+}
 
-type ThemeRequestData = {
+interface ThemeRequestData {
   Theme: string;
-};
+}
 
-type UserHashRequestData = {
+interface UserHashRequestData {
   userHash: string;
+}
+
+interface SetCollectionParams {
+  //1 or 0. If 0 then qtyOwned is automatically set to 0
+  own: 1 | 0;
+  want: 1 | 0;
+  // 0-999. If > 0 then own is automatically set to 1
+  qtyOwned: number;
+  // User notes, max 1000 characters
+  notes: string;
+}
+
+interface GetCollectionParams {
+  // Set to 1 to retrieve owned
+  owned?: 1;
+  // Set to 1 to retrieve wanted
+  wanted?: 1;
+  /**  Search term: searches set number, name, theme and subtheme */
+  query?: string;
+}
+
+type SetMinifigCollectionRequestData = UserHashRequestData & {
+  minifigNumber: string;
+  params: SetCollectionParams;
 };
-
-type SetCollectionParams = {
-    //1 or 0. If 0 then qtyOwned is automatically set to 0
-    own: 1 | 0;
-    want: 1 | 0;
-    // 0-999. If > 0 then own is automatically set to 1
-    qtyOwned: number;
-    // User notes, max 1000 characters
-    notes: string;
-}
-
-type GetCollectionParams = {
-    // Set to 1 to retrieve owned
-    owned?: 1;
-    // Set to 1 to retrieve wanted
-    wanted?: 1;
-    /**  Search term: searches set number, name, theme and subtheme */
-    query?: string;
-}
-
-type SetMinifigCollectionRequestData = UserHashRequestData & { minifigNumber: string, params: SetCollectionParams };
-type GetMinifigCollectionRequestData = UserHashRequestData & { params: GetCollectionParams };
-type SetCollectionRequestData = UserHashRequestData & SetIDRequestData & { params: SetCollectionParams & {
-    // User rating 1-5
-    rating: number;
-}};
-type GetSetsRequestData = UserHashRequestData & { params: {
+type GetMinifigCollectionRequestData = UserHashRequestData & {
+  params: GetCollectionParams;
+};
+type SetCollectionRequestData = UserHashRequestData &
+  SetIDRequestData & {
+    params: SetCollectionParams & {
+      // User rating 1-5
+      rating: number;
+    };
+  };
+type GetSetsRequestData = UserHashRequestData & {
+  params: {
     //Internal SetID
     setID?: number;
     //  will accept a Decimal value or a comma delimited list.
@@ -85,9 +94,11 @@ type GetSetsRequestData = UserHashRequestData & { params: {
     pageNumber?: number;
     /**  Set to 1 to retrieve the full data set, including tags, description and notes. */
     extendedData?: 1;
-} & GetCollectionParams };
+  } & GetCollectionParams;
+};
 
-export type BricklinkApiRequestData = { params?: any } & (LoginRequestData
+export type BricklinkApiRequestData = { params?: unknown } & (
+  | LoginRequestData
   | SetIDRequestData
   | SetNumberRequestData
   | ThemeRequestData
@@ -95,9 +106,13 @@ export type BricklinkApiRequestData = { params?: any } & (LoginRequestData
   | GetSetsRequestData
   | SetCollectionRequestData
   | SetMinifigCollectionRequestData
-  | GetMinifigCollectionRequestData);
+  | GetMinifigCollectionRequestData
+);
 
-type BricklinkApiErrorResponse = { status: "error"; message: string };
+interface BricklinkApiErrorResponse {
+  status: "error";
+  message: string;
+}
 export type BricklinkApiSuccessResponse<T> = { status: "success" } & T;
 export type BricklinkApiResponse<T> =
   | BricklinkApiSuccessResponse<T>
@@ -110,10 +125,10 @@ export type GetApiKeyUsageStatsResponse = BricklinkApiSuccessResponse<
 >;
 export type LoginResponse = BricklinkApiSuccessResponse<{ hash: string }>;
 export type GetSetsResponse = BricklinkApiSuccessResponse<
-  MatchesSubResponse<{ sets: set[] }>
+  MatchesSubResponse<{ sets: BricksetSet[] }>
 >;
 export type GetAdditionalImagesResponse = BricklinkApiSuccessResponse<
-  MatchesSubResponse<{ additionalImages: image[] }>
+  MatchesSubResponse<{ additionalImages: BricksetImage[] }>
 >;
 export type GetInstructionsResponse = BricklinkApiSuccessResponse<
   MatchesSubResponse<{ instructions: instruction[] }>
@@ -140,55 +155,53 @@ export type GetUserMinifigNotesResponse = BricklinkApiSuccessResponse<
   MatchesSubResponse<{ userMinifigNotes: userMinifigNote[] }>
 >;
 
+export interface getSetParams {
+  setID?: number;
+  /**  Search term: searches set number, name, theme and subtheme */
+  query?: string;
+  theme?: string | string[];
+  subtheme?: string | string[];
+  /**  Full set number, in the format {number}-{variant}, e.g. 6876-1 */
+  setNumber?: string | string[];
+  year?: number | number[];
+  tag?: string;
+  owned?: true;
+  wanted?: true;
+  /**  yyyy-mm-dd format */
+  updatedSince?: Date;
+  orderBy?: orderBy;
+  /**  default 20, max 500 */
+  pageSize?: number;
+  pageNumber?: number;
+  /**  Set to 1 to retrieve the full data set, including tags, description and notes. */
+  extendedData?: true;
+}
 
-export type getSetParams = {
-    setID?: number;
-    /**  Search term: searches set number, name, theme and subtheme */
-    query?: string;
-    theme?: string | string[];
-    subtheme?: string | string[];
-    /**  Full set number, in the format {number}-{variant}, e.g. 6876-1 */
-    setNumber?: string | string[];
-    year?: number | number[];
-    tag?: string;
-    owned?: true;
-    wanted?: true;
-    /**  yyyy-mm-dd format */
-    updatedSince?: Date;
-    orderBy?: orderBy;
-    /**  default 20, max 500 */
-    pageSize?: number;
-    pageNumber?: number;
-    /**  Set to 1 to retrieve the full data set, including tags, description and notes. */
-    extendedData?: true;
-  };
-  
-  export type setCollectionParams = {
-    /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
-    own: boolean;
-    want: boolean;
-    /**  0-999. If > 0 then own is automatically set to 1 */
-    qtyOwned: number;
-    /**  User notes, max 1000 characters */
-    notes: string;
-    /**  User rating 1-5 */
-    rating?: number;
-  };
-  
-  export type getMinifigCollectionParams = {
-    owned?: true;
-    wanted?: true;
-    /** This can be a minifig number or name. Wildcards are added before and after. If omitted, all minifigs owned are returned. */
-    query?: string;
-  };
-  
-  export type setMinifigCollectionParams = {
-    /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
-    own: boolean;
-    want: boolean;
-    /**  0-999. If > 0 then own is automatically set to 1 */
-    qtyOwned: number;
-    /**  User notes, max 1000 characters */
-    notes?: string;
-  };
-  
+export interface setCollectionParams {
+  /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
+  own: boolean;
+  want: boolean;
+  /**  0-999. If > 0 then own is automatically set to 1 */
+  qtyOwned: number;
+  /**  User notes, max 1000 characters */
+  notes: string;
+  /**  User rating 1-5 */
+  rating?: number;
+}
+
+export interface getMinifigCollectionParams {
+  owned?: true;
+  wanted?: true;
+  /** This can be a minifig number or name. Wildcards are added before and after. If omitted, all minifigs owned are returned. */
+  query?: string;
+}
+
+export interface setMinifigCollectionParams {
+  /**  1 or 0. If 0 then qtyOwned is automatically set to 0 */
+  own: boolean;
+  want: boolean;
+  /**  0-999. If > 0 then own is automatically set to 1 */
+  qtyOwned: number;
+  /**  User notes, max 1000 characters */
+  notes?: string;
+}

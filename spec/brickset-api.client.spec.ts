@@ -61,6 +61,11 @@ describe(BricksetApiClient, () => {
 
   describe("getKeyUsageStats", () => {
     it("calls the right endpoint", () => {
+        spy.mockResolvedValueOnce({ 
+            ok: true,
+            json: () => Promise.resolve({ status: "success", apiKeyUsage: [] }),
+        } as Response)
+
       client.getKeyUsageStats();
       expect(fetch).toHaveBeenCalledWith(
         "https://brickset.com/api/v3.asmx/getKeyUsageStats",
@@ -170,6 +175,11 @@ describe(BricksetApiClient, () => {
 
   describe("getReviews", () => {
     it("calls the right endpoint", () => {
+
+        spy.mockResolvedValueOnce({ 
+            ok: true,
+            json: () => Promise.resolve({ status: "success", reviews: [] }),
+        } as Response)
       client.getReviews(1);
       expect(fetch).toHaveBeenCalledWith(
         "https://brickset.com/api/v3.asmx/getReviews",
@@ -184,6 +194,10 @@ describe(BricksetApiClient, () => {
 
   describe("getSets", () => {
     it("calls the right endpoint", () => {
+        spy.mockResolvedValueOnce({ 
+            ok: true,
+            json: () => Promise.resolve({ status: "success", sets: [] }),
+        } as Response)
       client.getSets({
         extendedData: true,
         owned: true,
@@ -200,6 +214,10 @@ describe(BricksetApiClient, () => {
     });
 
     it("handles array params", () => {
+        spy.mockResolvedValueOnce({ 
+            ok: true,
+            json: () => Promise.resolve({ status: "success", sets: [] }),
+        } as Response)
       client.getSets({
         theme: ["test", "twee"],
         subtheme: ["test", "twee"],
@@ -217,6 +235,10 @@ describe(BricksetApiClient, () => {
     });
 
     it("limits pagesize to 999", () => {
+        spy.mockResolvedValueOnce({ 
+            ok: true,
+            json: () => Promise.resolve({ status: "success", sets: [] }),
+        } as Response)
       client.getSets({
         pageSize: 1500,
       });

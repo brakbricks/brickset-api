@@ -7,5 +7,5 @@ docs
 
 tsconfig.json
 tsup.config.ts
-jest.config.ts
 jest.config.js
+eslint.config.mjs
