@@ -1,0 +1,56 @@
+name: Create tag when version updates
+on: 
+  push:
+    branches: 
+      - 'main'
+
+permissions:
+  packages: write
+  contents: write
+  pages: write
+  id-token: write
+  
+jobs:
+  create-tag:
+    name: "Create Tag"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EndBug/version-check@v2
+        id: check
+        with:
+          file-url: https://unpkg.com/@brakbricks/brickset-api@latest/package.json
+          static-checking: localIsNew
+      - name: Use Node.js
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci  
+        if: steps.check.outputs.changed == 'true'
+      - run: npm run lint
+        if: steps.check.outputs.changed == 'true'
+      - run: npm run test 
+        if: steps.check.outputs.changed == 'true'
+      - run: npm run build 
+        if: steps.check.outputs.changed == 'true'
+      - run: zip brickset-api.v${{steps.check.outputs.version}}.zip ./dist/* -r
+        if: steps.check.outputs.changed == 'true'
+      - name: Create Release
+        if: steps.check.outputs.changed == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "brickset-api.v${{steps.check.outputs.version}}.zip"
+          tag: "v${{steps.check.outputs.version}}"
+          name: "v${{steps.check.outputs.version}}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          makeLatest: true
+          generateReleaseNotes: true
+
+
+
+
+  
+  

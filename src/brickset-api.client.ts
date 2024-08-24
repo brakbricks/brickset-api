@@ -2,12 +2,11 @@ import { BricksetApiException } from "./brickset-api.exception";
 import { BRICKLINK_API_BASEURL, ROUTES } from "./consts";
 import {
   apiKeyUsage,
-  image,
+  BricksetImage,
   instruction,
   minifigCollection,
-  orderBy,
   review,
-  set,
+  BricksetSet,
   subtheme,
   theme,
   userMinifigNote,
@@ -62,7 +61,10 @@ export class BricksetApiClient {
     const result = await this.request<GetApiKeyUsageStatsResponse>(
       ROUTES.GET_KEY_USAGE_STATS
     );
-    return result.apiKeyUsage;
+    return result.apiKeyUsage.map((value) => ({
+      count: value.count,
+      dateStamp: new Date(value.dateStamp),
+    }));
   }
 
   /**
@@ -78,19 +80,16 @@ export class BricksetApiClient {
 
   /**
    * Retrieve a list of sets, or more information about a particular one.
-   * TODO: This endpoint is limited to 100 calls a day, use queue?
-   * 
-   * 
-   */
-
-
-  /**
-   * 
+   * This endpoint is limited to 100 calls a day per key
+   *
    * @param params getSetParams
-   * @param userHash 
-   * @returns 
+   * @param userHash
+   * @returns
    */
-  async getSets(params: getSetParams, userHash: string = ""): Promise<set[]> {
+  async getSets(
+    params: getSetParams,
+    userHash: string = ""
+  ): Promise<BricksetSet[]> {
     const result = await this.request<GetSetsResponse>(ROUTES.GET_SETS, {
       params: {
         ...params,
@@ -112,13 +111,73 @@ export class BricksetApiClient {
       },
       userHash,
     });
-    return result.sets;
+    return result.sets.map((set) => ({
+      ...set,
+      lastUpdated: new Date(set.lastUpdated),
+      LEGOCom: {
+        US: set.LEGOCom.US
+          ? {
+              ...set.LEGOCom.US,
+              dateFirstAvailable: set.LEGOCom.US.dateFirstAvailable
+                ? new Date(set.LEGOCom.US.dateFirstAvailable)
+                : undefined,
+              dateLastAvailable: set.LEGOCom.US.dateLastAvailable
+                ? new Date(set.LEGOCom.US.dateLastAvailable)
+                : undefined,
+            }
+          : undefined,
+        UK: set.LEGOCom.UK
+          ? {
+              ...set.LEGOCom.UK,
+              dateFirstAvailable: set.LEGOCom.UK.dateFirstAvailable
+                ? new Date(set.LEGOCom.UK.dateFirstAvailable)
+                : undefined,
+              dateLastAvailable: set.LEGOCom.UK.dateLastAvailable
+                ? new Date(set.LEGOCom.UK.dateLastAvailable)
+                : undefined,
+            }
+          : undefined,
+        CA: set.LEGOCom.CA
+          ? {
+              ...set.LEGOCom.CA,
+              dateFirstAvailable: set.LEGOCom.CA.dateFirstAvailable
+                ? new Date(set.LEGOCom.CA.dateFirstAvailable)
+                : undefined,
+              dateLastAvailable: set.LEGOCom.CA.dateLastAvailable
+                ? new Date(set.LEGOCom.CA.dateLastAvailable)
+                : undefined,
+            }
+          : undefined,
+        DE: set.LEGOCom.DE
+          ? {
+              ...set.LEGOCom.DE,
+              dateFirstAvailable: set.LEGOCom.DE.dateFirstAvailable
+                ? new Date(set.LEGOCom.DE.dateFirstAvailable)
+                : undefined,
+              dateLastAvailable: set.LEGOCom.DE.dateLastAvailable
+                ? new Date(set.LEGOCom.DE.dateLastAvailable)
+                : undefined,
+            }
+          : undefined,
+      },
+    }));
+  }
+
+  /**
+   * Get a set by setNumber
+   * 
+   * @param setNumber 12345-1
+   * @returns BricksetSet | undefined
+   */
+  async getSet(setNumber: string): Promise<BricksetSet | undefined> {
+    const [set] = await this.getSets({ setNumber });
+    return set;
   }
 
   /**
    * Get a list of URLs of additional set images for the specified set.
    */
-  async getAdditionalImages(setID: number): Promise<image[]> {
+  async getAdditionalImages(setID: number): Promise<BricksetImage[]> {
     const result = await this.request<GetAdditionalImagesResponse>(
       ROUTES.GET_ADDITIONAL_IMAGES,
       { setID }
@@ -155,7 +214,10 @@ export class BricksetApiClient {
     const result = await this.request<GetReviewsResponse>(ROUTES.GET_REVIEWS, {
       setID,
     });
-    return result.reviews;
+    return result.reviews.map((review) => ({
+      ...review,
+      datePosted: new Date(review.datePosted)
+    }));
   }
 
   /**
@@ -182,7 +244,7 @@ export class BricksetApiClient {
   /**
    * Get a list of years for a given theme, with the total number of sets in each.
    */
-  async getYears(theme: string = ''): Promise<year[]> {
+  async getYears(theme: string = ""): Promise<year[]> {
     const result = await this.request<GetYearsResponse>(ROUTES.GET_YEARS, {
       Theme: theme,
     });
@@ -285,19 +347,19 @@ export class BricksetApiClient {
     return result.userMinifigNotes;
   }
 
-  private async request<T = {}>(
+  private async request<T = object>(
     url: string,
     data?: BricklinkApiRequestData
   ): Promise<BricklinkApiSuccessResponse<T>> {
-    const response = (await fetch(BRICKLINK_API_BASEURL + url, 
-    {
+    const response = await fetch(BRICKLINK_API_BASEURL + url, {
       method: "POST",
-      body: Object.entries({ 
-        ...data, 
-        params: data?.params !== undefined ? JSON.stringify(data.params) : undefined,
-        apiKey: this.apiKey
+      body: Object.entries({
+        ...data,
+        params:
+          data?.params !== undefined ? JSON.stringify(data.params) : undefined,
+        apiKey: this.apiKey,
       })
-        .filter(([key, value]) => value !== undefined)
+        .filter((param) => param[1] !== undefined)
         .map(
           ([key, value]) =>
             encodeURIComponent(key) +
@@ -308,13 +370,13 @@ export class BricksetApiClient {
       headers: {
         "Content-Type": `application/x-www-form-urlencoded`,
       },
-    }));
+    });
 
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
 
-    const responseData = await response.json() as BricklinkApiResponse<T>;
+    const responseData = (await response.json()) as BricklinkApiResponse<T>;
 
     if (responseData.status === "error") {
       throw new BricksetApiException(responseData.message);

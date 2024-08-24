@@ -1,6 +1,6 @@
 {
   "name": "@brakbricks/brickset-api",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "A typescript Brickset API client",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -8,7 +8,9 @@
   "scripts": {
     "build": "tsup",
     "test": "jest",
-    "docs": "typedoc src/index.ts"
+    "docs": "typedoc src/index.ts",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src"
   },
   "keywords": [
     "Lego",
@@ -18,15 +20,21 @@
   "repository": {
     "url": "git+https://github.com/brakbricks/brickset-api.git"
   },
+  "homepage": "https://brakbricks.github.io/brickset-api/",
+  "bugs": "https://github.com/brakbricks/brickset-api/issues",
   "author": "Brakbricks",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "@jest/globals": "^29.7.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.12",
+    "eslint": "^9.9.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.4",
     "tsup": "^8.2.4",
     "typedoc": "^0.26.5",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.1.0"
   }
 }

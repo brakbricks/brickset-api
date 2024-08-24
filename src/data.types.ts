@@ -19,7 +19,7 @@ export type orderBy =
   | "CollectionID"
   | "Rank";
 
-export type set = {
+export interface BricksetSet {
   setID: number;
   number: string;
   numberVariant: number;
@@ -32,7 +32,7 @@ export type set = {
   released: boolean;
   pieces?: number;
   minifigs?: number;
-  image: image;
+  image: BricksetImage;
   bricksetURL: string;
   collection: collection;
   collections: collections;
@@ -48,80 +48,80 @@ export type set = {
   barcode: barcodes;
   extendedData?: extendedData;
   lastUpdated: Date;
-};
+}
 
-export type LEGOCom = {
-  US: LEGOComDetails;
-  UK: LEGOComDetails;
-  CA: LEGOComDetails;
-  DE: LEGOComDetails;
-};
+interface LEGOCom {
+  US?: LEGOComDetails;
+  UK?: LEGOComDetails;
+  CA?: LEGOComDetails;
+  DE?: LEGOComDetails;
+}
 
-export type LEGOComDetails = {
+interface LEGOComDetails {
   retailPrice?: number;
   dateFirstAvailable?: Date;
   dateLastAvailable?: Date;
-};
+}
 
-export type dimensions = {
+interface dimensions {
   height?: number;
   width?: number;
   depth?: number;
   weight?: number;
-};
+}
 
-export type extendedData = {
+interface extendedData {
   notes: string;
   tags: string[];
   description: string;
-};
+}
 
-export type collection = {
+interface collection {
   owned?: boolean;
   wanted?: boolean;
   qtyOwned?: number;
   rating?: number;
   notes: string;
-};
+}
 
-export type collections = {
+interface collections {
   ownedBy?: number;
   wantedBy?: number;
-};
+}
 
-export type barcodes = {
+interface barcodes {
   EAN?: string;
   UPC?: string;
-};
+}
 
-export type ageRange = {
+interface ageRange {
   min?: number;
   max?: number;
-};
+}
 
-export type image = {
+export interface BricksetImage {
   thumbnailURL: string;
   imageURL: string;
-};
+}
 
-export type rating = {
+export interface rating {
   overall: number;
   parts: number;
   buildingExperience: number;
   playability: number;
   valueForMoney: number;
-};
+}
 
-export type review = {
+export interface review {
   author: string;
   datePosted: Date;
   rating: rating;
   title: string;
   review: string;
   HTML: boolean;
-};
+}
 
-export type minifigCollection = {
+export interface minifigCollection {
   minifigNumber: string;
   name: string;
   category: string;
@@ -129,43 +129,46 @@ export type minifigCollection = {
   ownedLoose: number;
   ownedTotal: number;
   wanted: boolean;
-};
+}
 
-export type theme = {
+export interface theme {
   theme: string;
   setCount: number;
   subthemeCount: number;
   yearFrom: number;
   yearTo: number;
-};
+}
 
-export type subtheme = {
+export interface subtheme {
   theme: string;
   subtheme: string;
   setCount: number;
   yearFrom: number;
   yearTo: number;
-};
+}
 
-export type year = {
+export interface year {
   theme: string;
   year: string;
   setCount: number;
-};
+}
 
-export type instruction = {
+export interface instruction {
   URL: string;
   description: string;
-};
+}
 
-export type userNote = {
+export interface userNote {
   setID: number;
   notes: string;
-};
+}
 
-export type userMinifigNote = {
+export interface userMinifigNote {
   minifigNumber: string;
   notes: string;
-};
+}
 
-export type apiKeyUsage = { dateStamp: Date; count: number };
+export interface apiKeyUsage {
+  dateStamp: Date;
+  count: number;
+}
